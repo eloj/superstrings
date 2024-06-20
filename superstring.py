@@ -78,7 +78,7 @@ if __name__ == "__main__":
 	name_offsets = "offsets"
 
 	if len(sys.argv) == 1:
-		filename = "examples/MOS6510-mnem-basic.txt"
+		filename = "data/MOS6510-mnem-basic.txt"
 	else:
 		filename = sys.argv[1]
 
