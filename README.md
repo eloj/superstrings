@@ -19,7 +19,7 @@ a more _optimal_ solution, one which exploits the fact that strings in the input
 Finding the _shortest_ such superstring is NP-hard, but there are algorithms to approximate it,
 the simplest of which is called 'Greedy'[^wikiGreedy]
 
-Greedy is conjectured to have an _approximation guarantee_ of two, though the _proven_ bound[^Kaplan2004][^Englert2021] is much worse.
+Greedy is conjectured to have an _approximation factor_ of two, though the _proven_ upper bound[^Kaplan2004][^Englert2021] is much worse.
 
 ## Tool Discussion
 
@@ -96,6 +96,6 @@ res = ssp.generate_superstring(arr)
 
 * Verify that the type-spec in ssp.py is actually correct.
 [^wikiGreedy]: So named for [the obvious reason](https://en.wikipedia.org/wiki/Greedy_algorithm)
-[^Blum1994]: "[Linear Approximation of Shortest Superstrings](https://ir.cwi.nl/pub/1422/1422D.pdf)", Blum et al., 1994.
+[^Blum1994]: "[Linear Approximation of Shortest Superstrings](https://ir.cwi.nl/pub/1422/1422D.pdf)", Blum, Jiang, Li, et al., 1994.
 [^Kaplan2004]: "[The Greedy Algorithm for Shortest Superstrings](https://doi.org/10.1016/j.ipl.2004.09.012)", Kaplan & Shafrir, 2004.
-[^Englert2021]: "Improved Approximation Guarantees for Shortest Superstrings...", [arXiv:2111.03968](https://arxiv.org/abs/2111.03968)
+[^Englert2021]: "[Improved Approximation Guarantees for Shortest Superstrings...](https://arxiv.org/abs/2111.03968)", Englert, Matsakis, Veselý, 2021. (arXiv:2111.03968)
