@@ -22,9 +22,9 @@ superstring, plus some auxiliary information and tables that may or may not be u
 This repository is an artifact of an ultimately failed experiment to see if superstrings could be used to size-optimize the
 mnemonics table of a C64 assembler or disassembler. I may still write it up at some point, though that seems increasingly unlikely.
 
-As of writing, the tool is extremely hacky, and other than accepting a file name, you must change the source in order to
-change options. Much of the output could be wrong, and some of the configuration options are broken or interact in
-non-obvious ways. Caveat emptor indeed.
+As of writing, the tool is extremely hacky, and other than accepting a file, you must change the source in order to
+change options. Some of the information output could be (subtly) wrong, and some of the configuration options are broken,
+or interact in non-obvious ways. Caveat emptor indeed.
 
 I've been meaning to essentially rewrite it, but since it's been more than six months now I'm just
 releasing it as-is.
