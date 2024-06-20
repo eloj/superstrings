@@ -78,8 +78,10 @@ See the [ssp.py source code](ssp.py) for details.
 ### Example API Usage
 
 ```python
+import ssp
+
 arr = ['n', 'ora', 'bne', 'eor']
-res = generate_superstring(arr)
+res = ssp.generate_superstring(arr)
 # res=bneora
 ```
 
