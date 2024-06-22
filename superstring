@@ -113,7 +113,7 @@ if __name__ == "__main__":
 			max_klen = klen
 		original_input_len += klen
 
-	print_length_table = args.length_table or min_klen != max_klen
+	print_length_table = args.length_table or (args.index_table and (min_klen != max_klen))
 
 	if args.sort:
 		if not args.quiet:
