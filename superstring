@@ -65,26 +65,28 @@ def apply_move_to_front(arr, args):
 	return
 
 if __name__ == "__main__":
-	argp = argparse.ArgumentParser()
+	argp = argparse.ArgumentParser(
+		description = "Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings"
+	)
 
 	vgroup = argp.add_mutually_exclusive_group()
-	vgroup.add_argument("-q", "--quiet", help="Only output generated string", action="store_true")
+	vgroup.add_argument("-q", "--quiet", help="Least verbose", action="store_true")
 	vgroup.add_argument("-v", "--verbose", help="Increase output verbosity", action="count", default=0)
 
 	order_group = argp.add_mutually_exclusive_group()
 	order_group.add_argument("-s", "--shuffle", help="Shuffle the input", action="store_true", default=False)
-	order_group.add_argument("-S", "--sort", help="Sort input by frequency of terms", action="store_true", default=False)
+	order_group.add_argument("-S", "--sort", help="Sort input by entry frequency", action="store_true", default=False)
 
-	argp.add_argument("--comment", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
-	argp.add_argument("--mtf", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
+	argp.add_argument("--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
+	argp.add_argument("--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
 	argp.add_argument("-J", "--join-only", help="Only join input, don't generate superstring", action="store_true")
 	# argp.add_argument("--bps", help="Encode as n bits-per-symbol", action="extend", type=int, default=8)
 	argp.add_argument("-I", "--index-table", help="Always output offset/index table", action="store_true")
 	argp.add_argument("-L", "--length-table", help="Always output lengths table", action="store_true")
-	argp.add_argument("--rebase-lengths", help="Rebased lengths based on kmin", action="store_true")
+	argp.add_argument("-R", "--rebase-lengths", help="Rebase lengths based on minimum entry length", action="store_true")
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
-	argp.add_argument("infile", help="Input set of strings, one per line")
+	argp.add_argument("infile", help="File containing set of strings, one per line")
 
 	args = argp.parse_args()
 
