@@ -190,7 +190,7 @@ if __name__ == "__main__":
 		# Verification step:
 		if v != output[ofs:ofs+len(v)]:
 			print("ERROR in encoding! You've done goofed up!")
-			print(f"Expected {v} at offset {ofs}, got {res[ofs:ofs+len(v)]}")
+			print(f"Expected {v} at offset {ofs}, got {output[ofs:ofs+len(v)]}")
 			exit(1)
 
 	#
