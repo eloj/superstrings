@@ -26,49 +26,67 @@ Greedy is conjectured to have an _approximation factor_ of two, though the _prov
 The concept of this tool is simple; an input file with the string set to optimize is provided, and the tool generates an approximate
 superstring, plus some auxiliary information and tables that may or may not be useful.
 
+The [data](data) directory contains some example files to play with.
+
+It's perfectly valid to supply a file containing duplicated terms. This doesn't change anything for the superstring
+being generated -- these duplicates are removed in a pre-processing step -- but it's useful when you require a mapping
+between the term order in the input, and their corresponding locations in the superstring. This mapping can be generated
+using the `--index-table` option, and with it you can iterate over the input.
+
+<!--
 This repository is an artifact of an ultimately failed experiment to see if superstrings could be used to size-optimize the
 mnemonics table of a C64 assembler or disassembler. I may still write it up at some point, though that seems increasingly unlikely.
+-->
 
 ### Usage
 
-```bash
-usage: superstring [-h] [-q | -v] [-s | -S] [--comment COMMENT] [--mtf MTF] [-J] [-I] [-L] [--rebase-lengths] [-V] infile
+```console
+usage: superstring [-h] [-q | -v] [-s | -S] [--comment STR] [--mtf STR] [-J] [-I] [-L] [-R] [-V] infile
 
 positional arguments:
-  infile              Input set of strings, one per line
+  infile                File containing set of strings, one per line
 
 options:
-  -h, --help          show this help message and exit
-  -q, --quiet         Only output generated string
-  -v, --verbose       Increase output verbosity
-  -s, --shuffle       Shuffle the input
-  -S, --sort          Sort input by frequency of terms
-  --comment COMMENT   String(s) that start a comment in the input
-  --mtf MTF           Input element(s) to move-to-front
-  -J, --join-only     Only join input, don't generate superstring
-  -I, --index-table   Always output offset/index table
-  -L, --length-table  Always output lengths table
-  --rebase-lengths    Rebased lengths based on kmin
-  -V, --version       Display program version and exit
+  -h, --help            show this help message and exit
+  -q, --quiet           Least verbose
+  -v, --verbose         Increase output verbosity
+  -s, --shuffle         Shuffle the input
+  -S, --sort            Sort input by entry frequency
+  --comment STR         String(s) that start a comment in the input
+  --mtf STR             Input element(s) to move-to-front
+  -J, --join-only       Only join input, don't generate superstring
+  -I, --index-table     Always output offset/index table
+  -L, --length-table    Always output lengths table
+  -R, --rebase-lengths  Rebase lengths based on minimum entry length
+  -V, --version         Display program version and exit
 ```
 
-### Example
+### Usage examples
 
-```bash
-$ ./superstring -v --index-table data/MOS6510-mnem-basic.txt
+Basic example using a commonly referenced [DNA fragment string set](data/dna-example.txt):
+
+```console
+$ ./superstring -q data/dna-example.txt
+GCTAAGTTCATGCATC
+```
+
+Generating a superstring and offset table for [6502 opcodes](data/MOS6510-mnem-basic.txt), which are all three characters long:
+
+```console
+$ ./superstring -v --index-table --mtf JAM data/MOS6510-mnem-basic.txt
 Removing duplicates from input.
+Applying move to front on input set ['JAM']
+Moved JAM at index 2 to front.
 256 strings (total len=768, min/max klen=3/3) in input, 57 unique strings (total len=171) remain.
 Final pre-processed input:
-['BRK', 'ORA', 'JAM', 'ASL', 'PHP', 'BPL', 'CLC', 'JSR', 'AND', 'BIT', 'ROL', 'PLP', 'BMI', 'SEC', 'RTI', 'EOR', 'LSR', 'PHA', 'JMP', 'BVC', 'CLI', 'RTS', 'ADC', 'ROR', 'PLA', 'BVS', 'SEI', 'STA', 'STY', 'STX', 'DEY', 'TXA', 'BCC', 'TYA', 'TXS', 'LDY', 'LDA', 'LDX', 'TAY', 'TAX', 'BCS', 'CLV', 'TSX', 'CPY', 'CMP', 'DEC', 'INY', 'DEX', 'BNE', 'CLD', 'CPX', 'SBC', 'INC', 'INX', 'NOP', 'BEQ', 'SED']
+['JAM', 'BRK', 'ORA', 'ASL', 'PHP', 'BPL', 'CLC', 'JSR', 'AND', 'BIT', 'ROL', 'PLP', 'BMI', 'SEC', 'RTI', 'EOR', 'LSR', 'PHA', 'JMP', 'BVC', 'CLI', 'RTS', 'ADC', 'ROR', 'PLA', 'BVS', 'SEI', 'STA', 'STY', 'STX', 'DEY', 'TXA', 'BCC', 'TYA', 'TXS', 'LDY', 'LDA', 'LDX', 'TAY', 'TAX', 'BCS', 'CLV', 'TSX', 'CPY', 'CMP', 'DEC', 'INY', 'DEX', 'BNE', 'CLD', 'CPX', 'SBC', 'INC', 'INX', 'NOP', 'BEQ', 'SED']
 Output alphabet size=21:
 ABCDEHIJKLMNOPQRSTVXY
 Generated Superstring is 127 characters, saving 641 on original, 44 on unique:
-BRKTAXBVCLIJMPSTAYRORTSXSTXADEYSECMPLDXBEQSEINYBVSBCCPXBCSTYAJSRTINCLDYBITXSEDECLCPYBPLPLABMINXNOPHPHADCLVJAMBNEORASLSROLDANDEX
-The 256 verified ok offsets (~1681/224*8 bits, min unit=7 bits) are:
-[0, 112, 106, 106, 106, 112, 114, 106, 97, 112, 114, 106, 106, 112, 114, 106, 84, 112, 106, 106, 106, 112, 114, 106, 79, 112, 106, 106, 106, 112, 114, 106, 61, 122, 106, 106, 71, 122, 118, 106, 85, 122, 118, 106, 71, 122, 118, 106, 90, 122, 106, 106, 106, 122, 118, 106, 31, 122, 106, 106, 106, 122, 118, 106, 63, 111, 106, 106, 106, 111, 116, 106, 99, 111, 116, 106, 11, 111, 116, 106, 6, 111, 106, 106, 106, 111, 116, 106, 8, 111, 106, 106, 106, 111, 116, 106, 20, 101, 106, 106, 106, 101, 18, 106, 87, 101, 18, 106, 11, 101, 18, 106, 47, 101, 106, 106, 106, 101, 18, 106, 42, 101, 106, 106, 106, 101, 18, 106, 106, 14, 106, 106, 57, 14, 24, 106, 28, 106, 25, 106, 57, 14, 24, 106, 50, 14, 106, 106, 57, 14, 24, 106, 58, 14, 73, 106, 106, 14, 106, 106, 68, 120, 36, 106, 68, 120, 36, 106, 15, 120, 3, 106, 68, 120, 36, 106, 55, 120, 106, 106, 68, 120, 36, 106, 103, 120, 21, 106, 68, 120, 36, 106, 81, 33, 106, 106, 81, 33, 77, 106, 44, 33, 124, 106, 81, 33, 77, 106, 109, 33, 106, 106, 106, 33, 77, 106, 67, 33, 106, 106, 106, 33, 77, 106, 52, 49, 106, 106, 52, 49, 65, 106, 92, 49, 95, 106, 52, 49, 65, 106, 39, 49, 106, 106, 106, 49, 65, 106, 75, 49, 106, 106, 106, 49, 65, 106]
+JAMTAXBVCLIJMPSTAYRORTSXSTXADEYSECMPLDXBEQSEINYBVSBCCPXBCSTYAJSRTINCLDYBITXSEDECLCPYBPLPLABMINXNOPHPHADCLVBNEORASLSROLDANDEXBRK
+The 256 verified ok offsets (~1057/224*8 bits, min unit=7 bits) are:
+[124, 109, 0, 0, 0, 109, 111, 0, 97, 109, 111, 0, 0, 109, 111, 0, 84, 109, 0, 0, 0, 109, 111, 0, 79, 109, 0, 0, 0, 109, 111, 0, 61, 119, 0, 0, 71, 119, 115, 0, 85, 119, 115, 0, 71, 119, 115, 0, 90, 119, 0, 0, 0, 119, 115, 0, 31, 119, 0, 0, 0, 119, 115, 0, 63, 108, 0, 0, 0, 108, 113, 0, 99, 108, 113, 0, 11, 108, 113, 0, 6, 108, 0, 0, 0, 108, 113, 0, 8, 108, 0, 0, 0, 108, 113, 0, 20, 101, 0, 0, 0, 101, 18, 0, 87, 101, 18, 0, 11, 101, 18, 0, 47, 101, 0, 0, 0, 101, 18, 0, 42, 101, 0, 0, 0, 101, 18, 0, 0, 14, 0, 0, 57, 14, 24, 0, 28, 0, 25, 0, 57, 14, 24, 0, 50, 14, 0, 0, 57, 14, 24, 0, 58, 14, 73, 0, 0, 14, 0, 0, 68, 117, 36, 0, 68, 117, 36, 0, 15, 117, 3, 0, 68, 117, 36, 0, 55, 117, 0, 0, 68, 117, 36, 0, 103, 117, 21, 0, 68, 117, 36, 0, 81, 33, 0, 0, 81, 33, 77, 0, 44, 33, 121, 0, 81, 33, 77, 0, 106, 33, 0, 0, 0, 33, 77, 0, 67, 33, 0, 0, 0, 33, 77, 0, 52, 49, 0, 0, 52, 49, 65, 0, 92, 49, 95, 0, 52, 49, 65, 0, 39, 49, 0, 0, 0, 49, 65, 0, 75, 49, 0, 0, 0, 49, 65, 0]
 ```
-
-The thing you probably care about is the line after "Generated Superstring..."
 
 The offsets provide a mapping from the index of a string in the input set, to the start of that string within the superstring.
 
@@ -98,14 +116,16 @@ See the [ssp.py source code](ssp.py) for details.
 ```python
 import ssp
 
-arr = ['n', 'ora', 'bne', 'eor']
+arr = ["CATGC", "CTAAGT", "GCTA", "TTCA", "ATGCATC"]
+
 res = ssp.generate_superstring(arr)
-# res=bneora
+# res=GCTAAGTTCATGCATC
 ```
 
 ## TODO
 
 * Verify that the type-spec in ssp.py is actually correct.
+
 [^wikiGreedy]: So named for [the obvious reason](https://en.wikipedia.org/wiki/Greedy_algorithm)
 [^Blum1994]: "[Linear Approximation of Shortest Superstrings](https://ir.cwi.nl/pub/1422/1422D.pdf)", Blum, Jiang, Li, et al., 1994.
 [^Kaplan2004]: "[The Greedy Algorithm for Shortest Superstrings](https://doi.org/10.1016/j.ipl.2004.09.012)", Kaplan & Shafrir, 2004.
