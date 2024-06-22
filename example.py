@@ -1,5 +1,6 @@
 import ssp
 
-arr = ['n', 'ora', 'bne', 'eor']
+arr = ["CATGC", "CTAAGT", "GCTA", "TTCA", "ATGCATC"]
+
 res = ssp.generate_superstring(arr)
 print(res)
