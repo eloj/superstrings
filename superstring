@@ -6,7 +6,7 @@
 # Copyright © 2024 Eddy Jansson
 # Licensed under the MIT License. See LICENSE file for details.
 #
-from math import log2, ceil
+from math import log2, ceil, gcd
 import argparse
 import random
 import ssp
@@ -18,7 +18,6 @@ import sys
 # TODO: --to-bitstrings
 # TODO: ?? --from-bitstrings (i.e input already bitstrings, adapt bps etc)
 #
-# TODO: correctly handle indeces vs offsets thoughtout, with option
 # TODO: ?? min/max klen should be in bits?
 # TODO: bitmap(s) to denote word starts, endings, iff variable klen.
 
@@ -83,7 +82,8 @@ if __name__ == "__main__":
 	# argp.add_argument("--bps", help="Encode as n bits-per-symbol", action="extend", type=int, default=8)
 	argp.add_argument("-I", "--index-table", help="Always output offset/index table", action="store_true")
 	argp.add_argument("-L", "--length-table", help="Always output lengths table", action="store_true")
-	argp.add_argument("-R", "--rebase-lengths", help="Rebase lengths based on minimum entry length", action="store_true")
+	argp.add_argument("-R", "--reduce-lengths", help="Reduce lengths based on minimum entry length/GCD", action="store_true")
+	argp.add_argument("-G", "--reduce-offsets", help="Reduce offsets based on their GCD (gen. indeces)", action="store_true")
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
 	argp.add_argument("infile", help="File containing set of strings, one per line")
@@ -183,8 +183,7 @@ if __name__ == "__main__":
 	total_index_bits_estimate = 0
 	for v in original_input:
 		ofs = output.index(v)
-		b = bits(ofs)
-		total_index_bits_estimate += b
+		total_index_bits_estimate += bits(ofs)
 
 		offsets.append(ofs)
 		lengths.append(len(v))
@@ -216,28 +215,49 @@ if __name__ == "__main__":
 	# Output index table
 	#
 	if args.index_table:
+		index_factor_str = ""
+		if args.reduce_offsets:
+			factor = gcd(*offsets)
+			if factor > 1:
+				if args.verbose:
+					print(f"Reducing offsets by a factor of {factor}.")
+				offsets = [a // factor for a in offsets]
+				index_factor_str = f"/{factor}"
+			else:
+				if args.verbose:
+					print(f"Reducing offsets not possible.")
+
 		if not args.quiet:
 			max_index = max(offsets)
 			max_index_bits = bits(max_index)
 			index_size_max = max_index_bits * len(offsets) // 8
-			print(f"The {len(offsets)} verified ok offsets (~{total_index_bits_estimate}/{index_size_max}*8 bits, min unit={max_index_bits} bits) are:")
+			print(f"The {len(offsets)} verified ok offsets{index_factor_str} (~{total_index_bits_estimate}/{index_size_max}*8 bits, min unit={max_index_bits} bits) are:")
 		print(offsets)
 
 	#
 	# Output length table
 	#
 	if print_length_table:
-		max_length_bits = bits(max_klen)
+		length_factor_str = ""
 
-		if args.rebase_lengths:
-			lengths = [a - min_klen for a in lengths]
-			max_length_bits = bits(max_klen - min_klen)
+		if args.reduce_lengths:
+			factor = gcd(*lengths)
+			# Only divide by factor is term size is non-uniform.
+			if factor > 1 and (min_klen != max_klen):
+				if args.verbose:
+					print(f"Reducing lengths by a factor of {factor}.")
+				lengths = [a // factor for a in lengths]
+				length_factor_str = f"/{factor}"
+			else:
+				if args.verbose:
+					print(f"Reducing lengths by {min_klen}.")
+				lengths = [a - min_klen for a in lengths]
+				length_factor_str = f"-{min_klen}"
 
 		if not args.quiet:
+			max_length_bits = bits(max(lengths))
 			index_length_max = max_length_bits * len(lengths) // 8
-			print(f"The {len(lengths)} lengths with min/max={min_klen}/{max_klen}, req. bits/entry={max_length_bits} bits, ({index_length_max} bytes total) are:")
-			if max_length_bits > bits(max_klen - min_klen):
-				print("NOTE: Could be optimized by subtracting out minimum first, for smaller unit size, see --rebase-lengths")
-			if args.rebase_lengths:
-				print(f"(lengths rebased, add back {min_klen} for true values)")
+			print(f"The {len(lengths)} lengths{length_factor_str} with min/max={min_klen}/{max_klen}, req. bits/entry={max_length_bits} bits, ({index_length_max} bytes total) are:")
+			if args.verbose and max_length_bits > bits(max_klen - min_klen):
+				print("NOTE: Lengths may be optimized for smaller unit size, see --reduce-lengths")
 		print(lengths)

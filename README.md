@@ -41,7 +41,7 @@ mnemonics table of a C64 assembler or disassembler. I may still write it up at s
 ### Usage
 
 ```console
-usage: superstring [-h] [-q | -v] [-s | -S] [--comment STR] [--mtf STR] [-J] [-I] [-L] [-R] [-V] infile
+usage: superstring [-h] [-q | -v] [-s | -S] [--comment STR] [--mtf STR] [-J] [-I] [-L] [-R] [-G] [-V] infile
 
 positional arguments:
   infile                File containing set of strings, one per line
@@ -57,7 +57,8 @@ options:
   -J, --join-only       Only join input, don't generate superstring
   -I, --index-table     Always output offset/index table
   -L, --length-table    Always output lengths table
-  -R, --rebase-lengths  Rebase lengths based on minimum entry length
+  -R, --reduce-lengths  Reduce lengths based on minimum entry length/GCD
+  -G, --reduce-offsets  Reduce offsets based on their GCD (gen. indeces)
   -V, --version         Display program version and exit
 ```
 
