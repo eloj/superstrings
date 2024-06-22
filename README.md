@@ -29,30 +29,43 @@ superstring, plus some auxiliary information and tables that may or may not be u
 This repository is an artifact of an ultimately failed experiment to see if superstrings could be used to size-optimize the
 mnemonics table of a C64 assembler or disassembler. I may still write it up at some point, though that seems increasingly unlikely.
 
-As of writing, the tool is extremely hacky, and other than accepting a file, you must change the source in order to
-change options. Some of the information output could be (subtly) wrong, and some of the configuration options are broken,
-or interact in non-obvious ways. Caveat emptor indeed.
-
-I've been meaning to essentially rewrite it, but since it's been more than six months now I'm just
-releasing it as-is.
-
 ### Usage
 
 ```bash
-$ ./superstring.py data/MOS6510-mnem-basic.txt
-Removing duplicate entries from input
-256 strings (total len=768, min/max len=3/3) in input, 57 unique strings (total len=171) remain.
+usage: superstring [-h] [-q | -v] [-s | -S] [--comment COMMENT] [--mtf MTF] [-J] [-I] [-L] [--rebase-lengths] [-V] infile
+
+positional arguments:
+  infile              Input set of strings, one per line
+
+options:
+  -h, --help          show this help message and exit
+  -q, --quiet         Only output generated string
+  -v, --verbose       Increase output verbosity
+  -s, --shuffle       Shuffle the input
+  -S, --sort          Sort input by frequency of terms
+  --comment COMMENT   String(s) that start a comment in the input
+  --mtf MTF           Input element(s) to move-to-front
+  -J, --join-only     Only join input, don't generate superstring
+  -I, --index-table   Always output offset/index table
+  -L, --length-table  Always output lengths table
+  --rebase-lengths    Rebased lengths based on kmin
+  -V, --version       Display program version and exit
+```
+
+### Example
+
+```bash
+$ ./superstring -v --index-table data/MOS6510-mnem-basic.txt
+Removing duplicates from input.
+256 strings (total len=768, min/max klen=3/3) in input, 57 unique strings (total len=171) remain.
+Final pre-processed input:
 ['BRK', 'ORA', 'JAM', 'ASL', 'PHP', 'BPL', 'CLC', 'JSR', 'AND', 'BIT', 'ROL', 'PLP', 'BMI', 'SEC', 'RTI', 'EOR', 'LSR', 'PHA', 'JMP', 'BVC', 'CLI', 'RTS', 'ADC', 'ROR', 'PLA', 'BVS', 'SEI', 'STA', 'STY', 'STX', 'DEY', 'TXA', 'BCC', 'TYA', 'TXS', 'LDY', 'LDA', 'LDX', 'TAY', 'TAX', 'BCS', 'CLV', 'TSX', 'CPY', 'CMP', 'DEC', 'INY', 'DEX', 'BNE', 'CLD', 'CPX', 'SBC', 'INC', 'INX', 'NOP', 'BEQ', 'SED']
-Generated Superstring is 127 characters, saving 641/44:
-BRKTAXBVCLIJMPSTAYRORTSXSTXADEYSECMPLDXBEQSEINYBVSBCCPXBCSTYAJSRTINCLDYBITXSEDECLCPYBPLPLABMINXNOPHPHADCLVJAMBNEORASLSROLDANDEX
-Shannon entropy(s): 4.202758 bits/symbol, 533.7502 bits (67 bytes)
-Alphabet size=21 (5 bits/symbol):
+Output alphabet size=21:
 ABCDEHIJKLMNOPQRSTVXY
+Generated Superstring is 127 characters, saving 641 on original, 44 on unique:
+BRKTAXBVCLIJMPSTAYRORTSXSTXADEYSECMPLDXBEQSEINYBVSBCCPXBCSTYAJSRTINCLDYBITXSEDECLCPYBPLPLABMINXNOPHPHADCLVJAMBNEORASLSROLDANDEX
 The 256 verified ok offsets (~1681/224*8 bits, min unit=7 bits) are:
 [0, 112, 106, 106, 106, 112, 114, 106, 97, 112, 114, 106, 106, 112, 114, 106, 84, 112, 106, 106, 106, 112, 114, 106, 79, 112, 106, 106, 106, 112, 114, 106, 61, 122, 106, 106, 71, 122, 118, 106, 85, 122, 118, 106, 71, 122, 118, 106, 90, 122, 106, 106, 106, 122, 118, 106, 31, 122, 106, 106, 106, 122, 118, 106, 63, 111, 106, 106, 106, 111, 116, 106, 99, 111, 116, 106, 11, 111, 116, 106, 6, 111, 106, 106, 106, 111, 116, 106, 8, 111, 106, 106, 106, 111, 116, 106, 20, 101, 106, 106, 106, 101, 18, 106, 87, 101, 18, 106, 11, 101, 18, 106, 47, 101, 106, 106, 106, 101, 18, 106, 42, 101, 106, 106, 106, 101, 18, 106, 106, 14, 106, 106, 57, 14, 24, 106, 28, 106, 25, 106, 57, 14, 24, 106, 50, 14, 106, 106, 57, 14, 24, 106, 58, 14, 73, 106, 106, 14, 106, 106, 68, 120, 36, 106, 68, 120, 36, 106, 15, 120, 3, 106, 68, 120, 36, 106, 55, 120, 106, 106, 68, 120, 36, 106, 103, 120, 21, 106, 68, 120, 36, 106, 81, 33, 106, 106, 81, 33, 77, 106, 44, 33, 124, 106, 81, 33, 77, 106, 109, 33, 106, 106, 106, 33, 77, 106, 67, 33, 106, 106, 106, 33, 77, 106, 52, 49, 106, 106, 52, 49, 65, 106, 92, 49, 95, 106, 52, 49, 65, 106, 39, 49, 106, 106, 106, 49, 65, 106, 75, 49, 106, 106, 106, 49, 65, 106]
-min/max offset=0/124
-Superstring: 127 + 224 + 0 = 351 bytes.
-Direct: 768 bytes.
 ```
 
 The thing you probably care about is the line after "Generated Superstring..."
@@ -61,13 +74,11 @@ The offsets provide a mapping from the index of a string in the input set, to th
 
 In the case that the input strings are not all of equal length, a length table will be generated too.
 
-The order of the input to the algorithm matters, and some orderings will generate a better/worse superstring. To this
-end it can be useful to set the `doshuffle` flag to True and rerunning the tool a couple of times.
+The order of the input to the algorithm matters, and some orderings will generate a shorter superstring than others.
+To this end it can be useful to use the `--shuffle` option and re-running the tool a couple of times.
 
-The `dosort` option will sort the input by frequency, which should reduce the size of the offset table.
-
-With minor changes the input can be transformed into binary strings, which can result in further optimized output, at the cost
-of more complicated decoding of course.
+The `--sort` option will sort the input by frequency, which can reduce the textual size of the offset table.
+The `--mtf` options has a similar use-case.
 
 ## Python Superstring Library API
 
