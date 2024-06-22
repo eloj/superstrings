@@ -39,7 +39,7 @@ releasing it as-is.
 ### Usage
 
 ```bash
-$ ./superstring.py examples/MOS6510-mnem-basic.txt
+$ ./superstring.py data/MOS6510-mnem-basic.txt
 Removing duplicate entries from input
 256 strings (total len=768, min/max len=3/3) in input, 57 unique strings (total len=171) remain.
 ['BRK', 'ORA', 'JAM', 'ASL', 'PHP', 'BPL', 'CLC', 'JSR', 'AND', 'BIT', 'ROL', 'PLP', 'BMI', 'SEC', 'RTI', 'EOR', 'LSR', 'PHA', 'JMP', 'BVC', 'CLI', 'RTS', 'ADC', 'ROR', 'PLA', 'BVS', 'SEI', 'STA', 'STY', 'STX', 'DEY', 'TXA', 'BCC', 'TYA', 'TXS', 'LDY', 'LDA', 'LDX', 'TAY', 'TAX', 'BCS', 'CLV', 'TSX', 'CPY', 'CMP', 'DEC', 'INY', 'DEX', 'BNE', 'CLD', 'CPX', 'SBC', 'INC', 'INX', 'NOP', 'BEQ', 'SED']
