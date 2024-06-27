@@ -33,7 +33,7 @@ def find_max_overlap(s1: str, s2: str) -> tuple[int, str]:
 	"""
 	Find the maximum overlap and "merge" of two strings.
 
-	Note that here f(s,s) => len(s), s
+	Note that here f(s,s) => len(s), s, and if no overlap => 0, ""
 
 	Args:
 		s1, s2: Strings to find overlap between.
@@ -51,6 +51,8 @@ def find_max_overlap(s1: str, s2: str) -> tuple[int, str]:
 #	if s2 in s1:
 #		return len2, s1
 
+	# PERF: Canonically you'd only check suffix vs prefix (OR vice-versa),
+	# PERF: but checking both ways generates slightly better superstrings _on average_.
 	max_i, max_j = 0, 0
 	for i in range(1, min(len1, len2) + 1):
 		# Try matching s1.suffix(i) with s2.prefix(i)
@@ -60,6 +62,10 @@ def find_max_overlap(s1: str, s2: str) -> tuple[int, str]:
 		# PERF: if len1 == len2, the full words are redundantly checked a second time here.
 		if s1[:i] == s2[len2-i:]:
 			max_j = i
+
+	if max_i == 0 and max_j == 0:
+		# No overlap. We don't care about the merge, don't waste time concatenating strings.
+		return 0, ""
 
 	if max_i >= max_j:
 		return max_i, s1 + s2[max_i:]
