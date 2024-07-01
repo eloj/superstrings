@@ -107,29 +107,29 @@ def greedy(arr: list[str]) -> str:
     Returns:
         str: An approximate superstring of the input.
     """
-    n = len(arr)
-    while n > 1:
-        longest_overlap, l, r = 0, 0, 0
+    num = len(arr)
+    while num > 1:
+        longest_overlap, idx_i, idx_j = 0, 0, 0
         merge = None
 
-        for i in range(n):
-            for j in range(i+1, n):
-                overlap, l_merge = find_max_overlap(arr[i], arr[j])
+        for i in range(num):
+            for j in range(i+1, num):
+                overlap, tmp_merge = find_max_overlap(arr[i], arr[j])
                 if overlap > longest_overlap:
                     longest_overlap = overlap
-                    l, r = i, j
-                    merge = l_merge
+                    idx_i, idx_j = i, j
+                    merge = tmp_merge
 
-        n -= 1
+        num -= 1
 
         if merge:
             # Replace one pair with the 'merge', the other with the last candidate.
-            arr[l] = merge
-            arr[r] = arr[n]
+            arr[idx_i] = merge
+            arr[idx_j] = arr[num]
         else:
             # No overlap, best we can do is concatenate. Last element is convenient.
             # Is there a heuristic for this?
-            arr[0] += arr[n]
+            arr[0] += arr[num]
         # arr.pop() # trim array -- not necessary with how we iterate
     # ... while n > 1
 
