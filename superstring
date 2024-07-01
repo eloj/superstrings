@@ -1,41 +1,42 @@
 #!/usr/bin/env python3
-#
-# Approximate Shortest Superstring Generator
-# https://github.com/eloj/superstrings/
-#
-# Copyright © 2024 Eddy Jansson
-# Licensed under the MIT License. See LICENSE file for details.
-#
+"""
+    Approximate Shortest Superstring Generator
+    https://github.com/eloj/superstrings/
+
+    Copyright © 2024 Eddy Jansson
+    Licensed under the MIT License. See LICENSE file for details.
+"""
 from math import log2, ceil, gcd
+import sys
 import argparse
 import random
 import ssp
-import sys
 
 # TODO: bits/bytes helper print function
 # TODO: transforms: (test with emoji!)
 # TODO: --bps --bits-per-symbol [auto,1-32] (default=8)
 # TODO: --to-bitstrings
 # TODO: ?? --from-bitstrings (i.e input already bitstrings, adapt bps etc)
-#
 # TODO: ?? min/max klen should be in bits?
 # TODO: bitmap(s) to denote word starts, endings, iff variable klen.
 
 PROGRAM_VERSION = "1.0.0"
 
 def bits(n):
+	""" Return the number of bits needed to encode the number _n_ """
 	if n == 0:
 		return 1
 	return ceil(log2(n))
 
-def calculate_bits_per_character(string, char_base='A'):
-	a = 0
-	for ch in string:
-		a |= ord(ch) - ord(char_base)
-	# print(a, bin(a))
-	return bits(a)
+#def calculate_bits_per_character(string, char_base='A'):
+#	a = 0
+#	for ch in string:
+#		a |= ord(ch) - ord(char_base)
+#	# print(a, bin(a))
+#	return bits(a)
 
 def data_loader(args):
+	""" Load data into array """
 	res = []
 
 	with open(args.infile, 'r', encoding="utf-8") as fp:
@@ -55,13 +56,13 @@ def data_loader(args):
 	return res
 
 def apply_move_to_front(arr, args):
+	""" Move each item in args.mtf to the front of the array """
 	for k in args.mtf:
 		idx = arr.index(k)
 		if idx > 0:
 			arr.insert(0, arr.pop(idx))
 			if not args.quiet:
 				print(f"Moved {arr[0]} at index {idx} to front.")
-	return
 
 if __name__ == "__main__":
 	# TODO: Add convert_arg_line_to_args= that splits by spaces but handles quoted strings.
@@ -97,7 +98,7 @@ if __name__ == "__main__":
 	args = argp.parse_args()
 
 	# https://github.com/python/cpython/issues/60603
-	if args.comment == None:
+	if args.comment is None:
 		args.comment = ['#']
 	if args.verbose > 1:
 		print(f"Comment prefix(es): {args.comment}")
@@ -218,9 +219,8 @@ if __name__ == "__main__":
 
 		# Verification step:
 		if v != output[ofs:ofs+len(v)]:
-			print("ERROR in encoding! You've done goofed up!")
 			print(f"Expected {v} at offset {ofs}, got {output[ofs:ofs+len(v)]}")
-			exit(1)
+			sys.exit("ERROR in encoding! You've done goofed up!")
 
 	#
 	# Output alphabet and alphabet size
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 				index_factor_str = f"/{factor}"
 			else:
 				if args.verbose:
-					print(f"Reducing offsets not possible.")
+					print("Offset reduction not possible.")
 
 		if not args.quiet:
 			max_index = max(offsets)
