@@ -83,12 +83,13 @@ if __name__ == "__main__":
 
 	argp.add_argument("-C", "--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
 	argp.add_argument("-F", "--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
-	argp.add_argument("-J", "--join-only", help="Only join input, don't generate superstring", action="store_true")
+	argp.add_argument("-j", "--join-only", help="Only join input, don't generate superstring", action="store_true")
 	# argp.add_argument("--bps", help="Encode as n bits-per-symbol", action="extend", type=int, default=8)
-	argp.add_argument("-I", "--index-table", help="Always output offset/index table", action="store_true")
-	argp.add_argument("-L", "--length-table", help="Always output lengths table", action="store_true")
+	argp.add_argument("-i", "--index-table", help="Always output offset/index table", action="store_true")
+	argp.add_argument("-l", "--length-table", help="Always output lengths table", action="store_true")
 	argp.add_argument("-R", "--reduce-lengths", help="Reduce lengths based on minimum entry length/GCD", action="store_true")
 	argp.add_argument("-G", "--reduce-offsets", help="Reduce offsets based on their GCD (gen. indeces)", action="store_true")
+	argp.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
 	argp.add_argument("infile", help="File containing set of strings, one per line")
@@ -178,7 +179,29 @@ if __name__ == "__main__":
 	if args.join_only:
 		output = "".join(transformed_input)
 	else:
-		output = ssp.generate_superstring(transformed_input)
+		min_output = ssp.generate_superstring(transformed_input)
+		if args.loops:
+			# Shuffle input and regenerate superstring until minimum length doesn't improve.
+			if not args.quiet:
+				print(f"Optimizing with {args.loops} loops per iteration.")
+			total_iters = iters = 0
+			while True:
+				iters += 1
+				total_iters += 1
+				random.shuffle(transformed_input)
+				s = ssp.generate_superstring(transformed_input)
+				if len(s) < len(min_output):
+					if args.verbose:
+						print(f"New best: {len(s)} at iteration {iters}, restarting.")
+					min_output = s
+					iters = 0
+				if not args.quiet and args.loops > 50 and iters % 50 == 0:
+					print(".", end="", flush=True)
+				if iters >= args.loops:
+					break
+			if args.verbose:
+				print(f"Steady state reached after {total_iters} total iterations.")
+		output = min_output
 
 	#
 	# Calculate and verify offsets

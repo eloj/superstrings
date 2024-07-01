@@ -41,25 +41,30 @@ mnemonics table of a C64 assembler or disassembler. I may still write it up at s
 ### Usage
 
 ```console
-usage: superstring [-h] [-q | -v] [-s | -S] [--comment STR] [--mtf STR] [-J] [-I] [-L] [-R] [-G] [-V] infile
+usage: superstring [-h] [-q | -v] [-s | -S] [-C STR] [-F STR] [-j] [-i] [-l] [-R] [-G] [-L LOOPS] [-V] infile
+
+Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings
 
 positional arguments:
-  infile                File containing set of strings, one per line
+  infile                   File containing set of strings, one per line
 
 options:
-  -h, --help            show this help message and exit
-  -q, --quiet           Least verbose
-  -v, --verbose         Increase output verbosity
-  -s, --shuffle         Shuffle the input
-  -S, --sort            Sort input by entry frequency
-  --comment STR         String(s) that start a comment in the input
-  --mtf STR             Input element(s) to move-to-front
-  -J, --join-only       Only join input, don't generate superstring
-  -I, --index-table     Always output offset/index table
-  -L, --length-table    Always output lengths table
-  -R, --reduce-lengths  Reduce lengths based on minimum entry length/GCD
-  -G, --reduce-offsets  Reduce offsets based on their GCD (gen. indeces)
-  -V, --version         Display program version and exit
+  -h, --help               show this help message and exit
+  -q, --quiet              Least verbose
+  -v, --verbose            Increase output verbosity
+  -s, --shuffle            Shuffle the input
+  -S, --sort               Sort input by entry frequency
+  -C STR, --comment STR    String(s) that start a comment in the input
+  -F STR, --mtf STR        Input element(s) to move-to-front
+  -j, --join-only          Only join input, don't generate superstring
+  -i, --index-table        Always output offset/index table
+  -l, --length-table       Always output lengths table
+  -R, --reduce-lengths     Reduce lengths based on minimum entry length/GCD
+  -G, --reduce-offsets     Reduce offsets based on their GCD (gen. indeces)
+  -L LOOPS, --loops LOOPS  Shuffle and regenerate until min-length doesn't improve
+  -V, --version            Display program version and exit
+
+You can also supply arguments from a file using the '@argsfile' syntax.
 ```
 
 ### Usage examples
@@ -94,10 +99,13 @@ The offsets provide a mapping from the index of a string in the input set, to th
 In the case that the input strings are not all of equal length, a length table will be generated too.
 
 The order of the input to the algorithm matters, and some orderings will generate a shorter superstring than others.
-To this end it can be useful to use the `--shuffle` option and re-running the tool a couple of times.
+To this end it can be useful to use the `--shuffle` option and re-running the tool a couple of times, or use `--loops` with
+a small iteration count (10-100'ish).
 
 The `--sort` option will sort the input by frequency, which can reduce the textual size of the offset table.
 The `--mtf` options has a similar use-case.
+
+This tool is meant for small problems. It is written in Python, after all.
 
 ## Python Superstring Library API
 
