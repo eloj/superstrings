@@ -64,8 +64,13 @@ def apply_move_to_front(arr, args):
 	return
 
 if __name__ == "__main__":
+	# TODO: Add convert_arg_line_to_args= that splits by spaces but handles quoted strings.
+
 	argp = argparse.ArgumentParser(
-		description = "Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings"
+		description = "Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings",
+		fromfile_prefix_chars='@',
+		epilog="You can also supply arguments from a file using the '@argsfile' syntax.",
+		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=28),
 	)
 
 	vgroup = argp.add_mutually_exclusive_group()
@@ -76,8 +81,8 @@ if __name__ == "__main__":
 	order_group.add_argument("-s", "--shuffle", help="Shuffle the input", action="store_true", default=False)
 	order_group.add_argument("-S", "--sort", help="Sort input by entry frequency", action="store_true", default=False)
 
-	argp.add_argument("--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
-	argp.add_argument("--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
+	argp.add_argument("-C", "--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
+	argp.add_argument("-F", "--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
 	argp.add_argument("-J", "--join-only", help="Only join input, don't generate superstring", action="store_true")
 	# argp.add_argument("--bps", help="Encode as n bits-per-symbol", action="extend", type=int, default=8)
 	argp.add_argument("-I", "--index-table", help="Always output offset/index table", action="store_true")
