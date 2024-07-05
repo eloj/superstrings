@@ -38,9 +38,13 @@ def bits(n):
 def data_loader(args):
 	""" Load data into array """
 	res = []
+	lines = []
 
-	with open(args.infile, 'r', encoding="utf-8") as fp:
-		lines = fp.readlines()
+	if not args.infile:
+		lines = sys.stdin.readlines()
+	else:
+		with open(args.infile, 'r', encoding="utf-8") as fp:
+			lines = fp.readlines()
 
 	for v in lines:
 		is_comment = False
@@ -93,7 +97,8 @@ if __name__ == "__main__":
 	argp.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
-	argp.add_argument("infile", help="File containing set of strings, one per line")
+	# default=sys.stdin, type=argparse.FileType('r')
+	argp.add_argument("infile", nargs="?", help="File containing set of strings, one per line")
 
 	args = argp.parse_args()
 
