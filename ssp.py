@@ -5,6 +5,7 @@ Copyright (c) 2024 Eddy Jansson
 
 See https://github.com/eloj/superstrings
 """
+from itertools import permutations # Used by brute()
 
 def make_substring_free(arr: list[str]) -> list[str]:
     """
@@ -135,8 +136,49 @@ def greedy(arr: list[str]) -> str:
 
     return arr[0]
 
+# Algorithm BRUTE
+#
+# For each ordering of the input, generate a superstring. Return the shortest one.
+#
+# Time: O(n-factorial)
+#
+# Notes:
+#   Warning! Extremely slow. Can only be used on _very_ small inputs (N ~< 16).
+#
+# References:
+#   "ADS1: Implementing SCS", Ben Langmead at https://www.youtube.com/watch?v=BHUgDbVC4js
+#
+def brute(arr: list[str]) -> str:
+    """
+    Generate Optimal Superstring using a brute-force enumeration.
 
-def generate_superstring(strings: list[str]) -> str:
+    Args:
+        arr: Input, e.g a set of words.
+    Returns:
+        str: The shortest common superstring of the input.
+    """
+
+    def overlap(a, b):
+        start = 0
+        while True:
+            start = a.find(b[:1], start)
+            if start == -1:
+                return 0
+            if b.startswith(a[start:]):
+                return len(a) - start
+            start += 1
+
+    shortest = None
+    for perm in permutations(arr):
+        sup = perm[0]
+        for i in range(len(arr) - 1):
+            olen = overlap(perm[i], perm[i+1])
+            sup += perm[i+1][olen:]
+        if shortest is None or len(sup) < len(shortest):
+            shortest = sup
+    return shortest
+
+def generate_superstring(strings: list[str], func=greedy) -> str:
     """
     Generate an approximate Superstring.
 
@@ -146,23 +188,25 @@ def generate_superstring(strings: list[str]) -> str:
     Returns:
         str: An approximate superstring of the input.
     """
-    return greedy(make_substring_free(strings))
+    return func(make_substring_free(strings))
 
 
 def basic_test():
     """ Basic functionality test """
     # Hard input for GREEDY. Kaplan 2005.
     # { c(ab)^k, (ba)^k, (ab)^kc }
-    # arr = ["cababab", "bababa", "abababc" ]
+    arr = ["cababab", "bababa", "abababc" ]
     # GREEDY=cabababcbababa, OPT=cababababc
-    arr = ['n', 'ora', 'bne', 'eor']
+    # arr = ['n', 'ora', 'bne', 'eor']
 
     arr = make_substring_free(arr)
-    print(arr)
-    # shuffle(arr)
+    print(f"prefix-free input: {arr}")
 
     res = generate_superstring(arr)
-    print(f"{res}, len={len(res)}")
+    print(f"greedy(): {res}, len={len(res)}")
+
+    res = generate_superstring(arr, brute)
+    print(f"brute(): {res}, len={len(res)}")
 
 if __name__ == "__main__":
     basic_test()

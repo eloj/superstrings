@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-    Approximate Shortest Superstring Generator
-    https://github.com/eloj/superstrings/
+	Approximate Shortest Superstring Generator
+	https://github.com/eloj/superstrings/
 
-    Copyright © 2024 Eddy Jansson
-    Licensed under the MIT License. See LICENSE file for details.
+	Copyright © 2024 Eddy Jansson
+	Licensed under the MIT License. See LICENSE file for details.
 """
 from math import log2, ceil, gcd
 import sys
@@ -85,6 +85,8 @@ if __name__ == "__main__":
 	order_group = argp.add_mutually_exclusive_group()
 	order_group.add_argument("-s", "--shuffle", help="Shuffle the input", action="store_true", default=False)
 	order_group.add_argument("-S", "--sort", help="Sort input by entry frequency", action="store_true", default=False)
+	order_group.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
+	order_group.add_argument("-B", "--brute", help="Use brute-force. Warning: Time O(N!)", action="store_true")
 
 	argp.add_argument("-C", "--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
 	argp.add_argument("-F", "--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
@@ -94,7 +96,6 @@ if __name__ == "__main__":
 	argp.add_argument("-l", "--length-table", help="Always output lengths table", action="store_true")
 	argp.add_argument("-R", "--reduce-lengths", help="Reduce lengths based on minimum entry length/GCD", action="store_true")
 	argp.add_argument("-G", "--reduce-offsets", help="Reduce offsets based on their GCD (gen. indeces)", action="store_true")
-	argp.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
 	# default=sys.stdin, type=argparse.FileType('r')
@@ -159,6 +160,13 @@ if __name__ == "__main__":
 	for v in unique_input:
 		unique_input_len += len(v)
 
+	if args.brute:
+		if not args.quiet:
+			if args.verbose > 0:
+				print("WARNING: Using brute-force is extremely slow. Use only on very small inputs.")
+			if len(unique_input) > 16:
+				print(f"WARNING: This run is unlikely to return a result in reasonable time (O({len(unique_input)}!).")
+
 	# Calculate fixed bits-per-symbol from input.
 	## if input_bps == 0:
 	## 	input_alphabet = "".join(sorted(set("".join(unique_input))))
@@ -185,7 +193,10 @@ if __name__ == "__main__":
 	if args.join_only:
 		output = "".join(transformed_input)
 	else:
-		min_output = ssp.generate_superstring(transformed_input)
+		if args.brute:
+			min_output = ssp.generate_superstring(transformed_input, ssp.brute)
+		else:
+			min_output = ssp.generate_superstring(transformed_input)
 		if args.loops:
 			# Shuffle input and regenerate superstring until minimum length doesn't improve.
 			if not args.quiet:
