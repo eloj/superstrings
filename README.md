@@ -1,6 +1,6 @@
 # Approximate Shortest Superstring Generator
 
-_WARNING: While this note persists, I may force-push to master_
+_WARNING: While this note persist, I may force-push to master_
 
 A Python library and tool for generating approximate [shortest common superstrings](https://en.wikipedia.org/wiki/Shortest_common_supersequence#Shortest_common_superstring).
 
@@ -41,7 +41,7 @@ mnemonics table of a C64 assembler or disassembler. I may still write it up at s
 ### Usage
 
 ```console
-usage: superstring [-h] [-q | -v] [-s | -S] [-C STR] [-F STR] [-j] [-i] [-l] [-R] [-G] [-L LOOPS] [-V] infile
+usage: superstring [-h] [-q | -v] [-s | -S | -L LOOPS | -B] [-C STR] [-F STR] [-j] [-i] [-l] [-R] [-G] [-V] [infile]
 
 Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings
 
@@ -54,6 +54,8 @@ options:
   -v, --verbose            Increase output verbosity
   -s, --shuffle            Shuffle the input
   -S, --sort               Sort input by entry frequency
+  -L LOOPS, --loops LOOPS  Shuffle and regenerate until min-length doesn't improve
+  -B, --brute              Use brute-force. Warning: Time O(N!)
   -C STR, --comment STR    String(s) that start a comment in the input
   -F STR, --mtf STR        Input element(s) to move-to-front
   -j, --join-only          Only join input, don't generate superstring
@@ -61,7 +63,6 @@ options:
   -l, --length-table       Always output lengths table
   -R, --reduce-lengths     Reduce lengths based on minimum entry length/GCD
   -G, --reduce-offsets     Reduce offsets based on their GCD (gen. indeces)
-  -L LOOPS, --loops LOOPS  Shuffle and regenerate until min-length doesn't improve
   -V, --version            Display program version and exit
 
 You can also supply arguments from a file using the '@argsfile' syntax.
@@ -104,6 +105,16 @@ a small iteration count (10-100'ish).
 
 The `--sort` option will sort the input by frequency, which can reduce the textual size of the offset table.
 The `--mtf` options has a similar use-case.
+
+The `--brute` option can be used to find the true optimal shortest superstring, but it is intractable for any but the
+_smallest_ of inputs, since this algorithm is of order N-factorial.
+
+```console
+$ ./superstring -q data/greedy-hard.txt
+cabababcbababa
+$ ./superstring -q --brute data/greedy-hard.txt
+cababababc
+```
 
 This tool is meant for small problems. It is written in Python, after all.
 
