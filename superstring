@@ -86,7 +86,7 @@ if __name__ == "__main__":
 	order_group.add_argument("-s", "--shuffle", help="Shuffle the input", action="store_true", default=False)
 	order_group.add_argument("-S", "--sort", help="Sort input by entry frequency", action="store_true", default=False)
 	order_group.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
-	order_group.add_argument("-B", "--brute", help="Use brute-force. Warning: Time O(N!)", action="store_true")
+	order_group.add_argument("-B", "--brute", help="Use brute-force. Warning: Only for tiny inputs!", action="store_true")
 
 	argp.add_argument("-C", "--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
 	argp.add_argument("-F", "--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
@@ -164,8 +164,8 @@ if __name__ == "__main__":
 		if not args.quiet:
 			if args.verbose > 0:
 				print("WARNING: Using brute-force is extremely slow. Use only on very small inputs.")
-			if len(unique_input) > 16:
-				print(f"WARNING: This run is unlikely to return a result in reasonable time (O({len(unique_input)}!).")
+			if len(unique_input) >= 30:
+				print(f"WARNING: This run is unlikely to return a result in reasonable time (N={len(unique_input)}).")
 
 	# Calculate fixed bits-per-symbol from input.
 	## if input_bps == 0:
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 		output = "".join(transformed_input)
 	else:
 		if args.brute:
-			min_output = ssp.generate_superstring(transformed_input, ssp.brute)
+			min_output = ssp.generate_superstring(transformed_input, ssp.brutedp)
 		else:
 			min_output = ssp.generate_superstring(transformed_input)
 		if args.loops:
