@@ -5,7 +5,7 @@ Copyright (c) 2024 Eddy Jansson
 
 See https://github.com/eloj/superstrings
 """
-from itertools import permutations # Used by brute()
+from itertools import permutations # Used by brute*()
 
 def make_substring_free(arr: list[str]) -> list[str]:
     """
@@ -178,6 +178,52 @@ def brute(arr: list[str]) -> str:
             shortest = sup
     return shortest
 
+# Algorithm BRUTE-DP
+#
+# Notes:
+#   Warning! Slow and extremely memory intensive. Can only be used on _very_ small inputs (N ~< 30)
+#
+# References:
+#   Timothy H Chang at https://www.youtube.com/watch?v=6rIamdWnn7A
+#
+def brutedp(arr: list[str]) -> str:
+    """
+    Generate Optimal Superstring using a brute-force dynamic-programming approach.
+
+    Extremely memory/cache inefficient.
+
+    Args:
+        arr: Input, e.g a set of words.
+    Returns:
+        str: The shortest common superstring of the input.
+    """
+    num = len(arr)
+    cost = [[0]*num for _ in range(num)]
+    for i in range(num):
+        for j in range(num):
+            for k in range(min(len(arr[i]), len(arr[j])), -1, -1):
+                if arr[i][-k:] == arr[j][:k]:
+                    cost[i][j] = k
+                    break
+
+    # Giant array with (cost, candidate_superstring) tuples.
+    dp = [[(float('inf'), "")]*num for _ in range(1 << num)]
+
+    # Bitmap (key) tracks which input elements have been merged.
+    for i in range(num):
+        dp[1 << i][i] = (len(arr[i]), arr[i])
+
+    for bitmap in range(1 << num):
+        # Generate indeces array from bitmap. Ugh.
+        indices = [i for i in range(num) if bitmap & (1 << i)]
+        for add, src in permutations(indices, 2):
+            cand = dp[bitmap ^ (1 << add)][src][1] + arr[add][cost[src][add]:]
+            # Update DP array with shortest candidate so far
+            dp[bitmap][add] = min(dp[bitmap][add], (len(cand), cand))
+
+    return min(dp[-1])[1]
+
+
 def generate_superstring(strings: list[str], func=greedy) -> str:
     """
     Generate an approximate Superstring.
@@ -207,6 +253,9 @@ def basic_test():
 
     res = generate_superstring(arr, brute)
     print(f"brute(): {res}, len={len(res)}")
+
+    res = generate_superstring(arr, brutedp)
+    print(f"brutedp(): {res}, len={len(res)}")
 
 if __name__ == "__main__":
     basic_test()
