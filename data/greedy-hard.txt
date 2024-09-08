@@ -1,0 +1,5 @@
+# Hard input for GREEDY. Kaplan 2005.
+# { c(ab)^k, (ba)^k, (ab)^kc }
+cababab
+bababa
+abababc
