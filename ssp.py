@@ -1,11 +1,12 @@
 """Approximate Shortest Superstrings
 
 MIT License
-Copyright (c) 2024 Eddy Jansson
+Copyright (c) 2024, 2025 Eddy Jansson
 
 See https://github.com/eloj/superstrings
 """
 from itertools import permutations # Used by brute*()
+from collections import defaultdict # Used by brutedijk
 
 def make_substring_free(arr: list[str]) -> list[str]:
     """
@@ -223,6 +224,40 @@ def brutedp(arr: list[str]) -> str:
 
     return min(dp[-1])[1]
 
+# Algorithm BRUTE-DIJKSTRA
+#
+# References:
+#   Alfe, https://stackoverflow.com/a/20074602
+#
+def brutedijkstra(arr: list[str]) -> str:
+    """
+    Generate Optimal Superstring using Dijkstras's algorithm (graph search)
+    
+    Memory inefficient.
+    
+    Args:
+        arr: Input, e.g a set of words.
+    Returns:
+        str: The shortest common superstring of the input.
+    """
+    paths = defaultdict(set)
+    paths[0] =  {''}
+    while paths:
+        min_len = min(paths.keys())
+        while paths[min_len]:
+            candidate = paths[min_len].pop()
+            updated = False
+            for seq in arr:
+                if seq in candidate:
+                    continue
+                updated = True
+                for i, _ in reversed(list(enumerate(seq))):
+                    if candidate.endswith(seq[:i]):
+                        newCandidate = candidate + seq[i:]
+                        paths[len(newCandidate)].add(newCandidate)
+            if not updated:
+                return candidate
+        del paths[min_len]
 
 def generate_superstring(strings: list[str], func=greedy) -> str:
     """
@@ -256,6 +291,9 @@ def basic_test():
 
     res = generate_superstring(arr, brutedp)
     print(f"brutedp(): {res}, len={len(res)}")
+
+    res = generate_superstring(arr, brutedijkstra)
+    print(f"brutedijkstra(): {res}, len={len(res)}")
 
 if __name__ == "__main__":
     basic_test()
