@@ -272,7 +272,7 @@ def generate_superstring(strings: list[str], func=greedy) -> str:
     return func(make_substring_free(strings))
 
 
-def basic_test():
+def basic_tests() -> None:
     """ Basic functionality test """
     # Hard input for GREEDY. Kaplan 2005.
     # { c(ab)^k, (ba)^k, (ab)^kc }
@@ -296,4 +296,4 @@ def basic_test():
     print(f"brutedijkstra(): {res}, len={len(res)}")
 
 if __name__ == "__main__":
-    basic_test()
+    basic_tests()
