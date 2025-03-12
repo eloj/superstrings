@@ -169,13 +169,13 @@ def brute(arr: list[str]) -> str:
                 return len(a) - start
             start += 1
 
-    shortest = None
+    shortest = ""
     for perm in permutations(arr):
         sup = perm[0]
         for i in range(len(arr) - 1):
             olen = overlap(perm[i], perm[i+1])
             sup += perm[i+1][olen:]
-        if shortest is None or len(sup) < len(shortest):
+        if shortest == "" or len(sup) < len(shortest):
             shortest = sup
     return shortest
 
@@ -258,6 +258,7 @@ def brutedijkstra(arr: list[str]) -> str:
             if not updated:
                 return candidate
         del paths[min_len]
+    return ""
 
 def generate_superstring(strings: list[str], func=greedy) -> str:
     """

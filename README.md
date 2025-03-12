@@ -1,8 +1,6 @@
 # Approximate Shortest Superstring Generator
 
-_WARNING: While this note persist, I may force-push to master_
-
-A Python library and tool for generating approximate [shortest common superstrings](https://en.wikipedia.org/wiki/Shortest_common_supersequence#Shortest_common_superstring).
+A Python tool for generating approximate [shortest common superstrings](https://en.wikipedia.org/wiki/Shortest_common_supersequence#Shortest_common_superstring).
 
 All code is provided under the [MIT License](LICENSE).
 
@@ -142,7 +140,7 @@ case it's 'brutedp'. If you specify an invalid name here, you should get a list 
 `make_substring_free(list) -> list`
 : For Greedy to work as originally specified, its input must be _substring-free_ (aka _factor-free_), i.e contain no elements that are substrings of one another. This function will process a list to ensure this pre-condition is true.
 
-See the [ssp.py source code](ssp.py) for details.
+See the [ssp.py source code](ssp.py) for details and references.
 
 ### Example API Usage
 
@@ -157,7 +155,6 @@ res = ssp.generate_superstring(arr)
 
 ## TODO
 
-* Verify that the type-spec in ssp.py is actually correct.
 * Implement encoding into bitstrings.
 * Built-in benchmark.
 
