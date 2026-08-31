@@ -311,7 +311,7 @@ if __name__ == "__main__":
 
 		if args.reduce_lengths:
 			factor = gcd(*lengths)
-			# Only divide by factor is term size is non-uniform.
+			# Only divide by factor if term size is non-uniform.
 			if factor > 1 and (min_klen != max_klen):
 				if args.verbose:
 					print(f"Reducing lengths by a factor of {factor}.")
