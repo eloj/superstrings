@@ -3,7 +3,7 @@
 	Approximate Shortest Superstring Generator
 	https://github.com/eloj/superstrings/
 
-	Copyright © 2024, 2025 Eddy Jansson
+	Copyright © 2024, 2025, 2026 Eddy Jansson
 	Licensed under the MIT License. See LICENSE file for details.
 """
 from math import log2, ceil, gcd
@@ -78,6 +78,34 @@ def apply_move_to_front(arr, args):
 			if not args.quiet:
 				print(f"Moved {arr[0]} at index {idx} to front.")
 
+def partition_n(arr, n = 1):
+	return [arr[i:i+n] for i in range(0, len(arr), n)]
+
+def generate_superstring(arr, algo_func, args):
+	min_output = ssp.generate_superstring(arr, algo_func)
+	if args.loops:
+		# Shuffle input and regenerate superstring until minimum length doesn't improve.
+		if not args.quiet:
+			print(f"Optimizing with {args.loops} loops per iteration.")
+		total_iters = iters = 0
+		while True:
+			iters += 1
+			total_iters += 1
+			random.shuffle(arr)
+			s = ssp.generate_superstring(arr, algo_func)
+			if len(s) < len(min_output):
+				if args.verbose:
+					print(f"New best: {len(s)} at iteration {iters}, restarting.")
+				min_output = s
+				iters = 0
+			if not args.quiet and args.loops > 50 and iters % 50 == 0:
+				print(".", end="", flush=True)
+			if iters >= args.loops:
+				break
+		if args.verbose:
+			print(f"Steady state reached after {total_iters} total iterations.")
+	return min_output
+
 if __name__ == "__main__":
 	# TODO: Add convert_arg_line_to_args= that splits by spaces but handles quoted strings.
 
@@ -107,6 +135,7 @@ if __name__ == "__main__":
 	argp.add_argument("-l", "--length-table", help="Always output lengths table", action="store_true")
 	argp.add_argument("-R", "--reduce-lengths", help="Reduce lengths based on minimum entry length/GCD", action="store_true")
 	argp.add_argument("-G", "--reduce-offsets", help="Reduce offsets based on their GCD (gen. indeces)", action="store_true")
+	argp.add_argument("-P", "--partitions", help="Split/Parition input into groups of N, and recursively generate superstrings", action="store", type=int, default=0)
 
 	argp.add_argument("-V", "--version", help="Display program version and exit", action="version", version=PROGRAM_VERSION)
 	# default=sys.stdin, type=argparse.FileType('r')
@@ -192,7 +221,7 @@ if __name__ == "__main__":
 	for v in unique_input:
 		unique_input_len += len(v)
 
-	if args.brute and len(unique_input) >= 30:
+	if args.brute and len(unique_input) >= 30 and args.partitions < 2:
 		print(f"WARNING: This run is unlikely to return a result in reasonable time (N={len(unique_input)}).")
 
 	# Calculate fixed bits-per-symbol from input.
@@ -220,30 +249,33 @@ if __name__ == "__main__":
 	output = None
 	if args.join_only:
 		output = "".join(transformed_input)
-	else:
-		min_output = ssp.generate_superstring(transformed_input, algo_func)
-		if args.loops:
-			# Shuffle input and regenerate superstring until minimum length doesn't improve.
-			if not args.quiet:
-				print(f"Optimizing with {args.loops} loops per iteration.")
-			total_iters = iters = 0
-			while True:
-				iters += 1
-				total_iters += 1
-				random.shuffle(transformed_input)
-				s = ssp.generate_superstring(transformed_input)
-				if len(s) < len(min_output):
+	elif len(transformed_input) > 0:
+		# Split into subproblems if requested.
+		if args.partitions > 1 and len(transformed_input) > args.partitions:
+			print(f"Partitioning enabled. Using groups of {args.partitions} over input to speed things up (result sub-optimal).")
+			arr = transformed_input
+			part_rounds = 0
+			while len(arr) != 1:
+				pending = []
+				part_rounds += 1
+				for workset in partition_n(arr, args.partitions):
+					#if len(pending) > 0 and len(workset) + len(pending) <= args.partitions:
+					#	if args.verbose:
+					#		print(f"Round {part_rounds} - Problem is small. Collapsing workset and pending.")
+					#	workset.extend(pending)
+					#	pending = []
 					if args.verbose:
-						print(f"New best: {len(s)} at iteration {iters}, restarting.")
-					min_output = s
-					iters = 0
-				if not args.quiet and args.loops > 50 and iters % 50 == 0:
-					print(".", end="", flush=True)
-				if iters >= args.loops:
-					break
-			if args.verbose:
-				print(f"Steady state reached after {total_iters} total iterations.")
-		output = min_output
+						print(f"Round {part_rounds} - Working on {",".join(workset)}, len={len(workset)}")
+					output = generate_superstring(workset, algo_func, args)
+					if args.verbose:
+						print(f"Round {part_rounds} - Pushing result onto pending: {output}")
+					pending.append(output)
+				arr = pending
+			output = pending[0]
+		else:
+			output = generate_superstring(transformed_input, algo_func, args)
+	else:
+		sys.exit("Nothing to process.")
 
 	#
 	# Calculate and verify offsets
