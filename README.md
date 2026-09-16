@@ -41,30 +41,32 @@ This tool is meant for small problems. It is written in Python, after all.
 ### Usage
 
 ```console
-usage: superstring [-h] [-q | -v] [-s | -S | -L LOOPS | -B | -A ALGO] [-C STR] [-F STR] [-j] [-i] [-l] [-R] [-G] [-V] [infile]
+usage: superstring [-h] [-q | -v] [-s | -S | -L LOOPS | -B | -A ALGO] [-C STR] [-F STR] [-j] [-i] [-l] [-R] [-G] [-P PARTITIONS] [-V] [infile]
 
 Approximate Shortest Superstring Generator -- https://github.com/eloj/superstrings
 
 positional arguments:
-  infile                   File containing set of strings, one per line
+  infile                    File containing set of strings, one per line
 
 options:
-  -h, --help               show this help message and exit
-  -q, --quiet              Least verbose
-  -v, --verbose            Increase output verbosity
-  -s, --shuffle            Shuffle the input
-  -S, --sort               Sort input by entry frequency
-  -L LOOPS, --loops LOOPS  Shuffle and regenerate until min-length doesn't improve
-  -B, --brute              Use brute-force. Warning: Only for tiny inputs!
-  -A ALGO, --algo ALGO     Algorithm selection
-  -C STR, --comment STR    String(s) that start a comment in the input
-  -F STR, --mtf STR        Input element(s) to move-to-front
-  -j, --join-only          Only join input, don't generate superstring
-  -i, --index-table        Always output offset/index table
-  -l, --length-table       Always output lengths table
-  -R, --reduce-lengths     Reduce lengths based on minimum entry length/GCD
-  -G, --reduce-offsets     Reduce offsets based on their GCD (gen. indeces)
-  -V, --version            Display program version and exit
+  -h, --help                show this help message and exit
+  -q, --quiet               Least verbose
+  -v, --verbose             Increase output verbosity
+  -s, --shuffle             Shuffle the input
+  -S, --sort                Sort input by entry frequency
+  -L LOOPS, --loops LOOPS   Shuffle and regenerate until min-length doesn't improve
+  -B, --brute               Use brute-force. Warning: Only for tiny inputs!
+  -A ALGO, --algo ALGO      Algorithm selection
+  -C STR, --comment STR     String(s) that start a comment in the input
+  -F STR, --mtf STR         Input element(s) to move-to-front
+  -j, --join-only           Only join input, don't generate superstring
+  -i, --index-table         Always output offset/index table
+  -l, --length-table        Always output lengths table
+  -R, --reduce-lengths      Reduce lengths based on minimum entry length/GCD
+  -G, --reduce-offsets      Reduce offsets based on their GCD (gen. indeces)
+  -P PARTITIONS, --partitions PARTITIONS
+                            Split/Parition input into groups of N, and recursively generate superstrings
+  -V, --version             Display program version and exit
 
 You can also supply arguments from a file using the '@argsfile' syntax.
 ```
@@ -119,6 +121,9 @@ cababababc
 
 The `--algo` option can be used to pick the search algorithm. The default is 'greedy', unless `--brute` was specified, in which
 case it's 'brutedp'. If you specify an invalid name here, you should get a list of valid options back.
+
+For large inputs, the option `--partitions` can be used. This will partition the input into groups of N strings, and recursively
+superstring groups with the chosen algorithm until only one string remains. The result will be less optimal, but this allows for very large input sets.
 
 ## Python Superstring Library API
 
