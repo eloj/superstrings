@@ -1,6 +1,9 @@
 import ssp
 
-arr = ["CATGC", "CTAAGT", "GCTA", "TTCA", "ATGCATC"]
+arr = ["CABABAB", "BABABA", "ABABABC" ]
 
 res = ssp.generate_superstring(arr)
+print(res)
+
+res = ssp.generate_superstring(arr, ssp.brute)
 print(res)
