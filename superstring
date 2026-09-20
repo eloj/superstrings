@@ -72,7 +72,13 @@ def data_loader(args) -> list[str]:
 def apply_move_to_front(arr, args):
 	""" Move each item in args.mtf to the front of the array """
 	for k in args.mtf:
-		idx = arr.index(k)
+		# Ugly, but list.index() throws if item not in list, and I don't intend to check first, doubling the work.
+		try:
+			idx = arr.index(k)
+		except ValueError:
+			idx = 0
+			if not args.quiet:
+				print(f"Warning: Item '{k}' is not in the input set, please check spelling/case.")
 		if idx > 0:
 			arr.insert(0, arr.pop(idx))
 			if not args.quiet:
