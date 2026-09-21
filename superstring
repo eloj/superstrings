@@ -7,7 +7,7 @@
 	Licensed under the MIT License. See LICENSE file for details.
 """
 from math import log2, ceil, gcd
-from multiprocessing import Process, Queue, current_process
+from multiprocessing import Process, Queue
 import sys
 import argparse
 import random
