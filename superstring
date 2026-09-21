@@ -62,10 +62,8 @@ def data_loader(args) -> list[str]:
 			if len(prefix) > 0 and v.startswith(prefix):
 				is_comment = True
 				break
-		if is_comment:
-			continue
-
-		res.append(v.strip())
+		if not is_comment:
+			res.append(v.strip())
 
 	return res
 
