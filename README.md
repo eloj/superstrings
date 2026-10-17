@@ -55,11 +55,11 @@ options:
   -s, --shuffle            Shuffle the input
   -S, --sort               Sort input by entry frequency
   -L LOOPS, --loops LOOPS  Shuffle and regenerate until min-length doesn't improve
-  -B, --brute              Use brute-force. Warning: Only for tiny inputs!
+  -B, --brute              Brute-force optimal superstring. Warning: Only for tiny inputs!
   -A ALGO, --algo ALGO     Algorithm selection
   -C STR, --comment STR    String(s) that start a comment in the input
   -F STR, --mtf STR        Input element(s) to move-to-front
-  -j, --join-only          Only join input, don't generate superstring
+  -j, --join-only          Only join input, don't approximate superstring
   -i, --index-table        Always output offset/index table
   -l, --length-table       Always output lengths table
   -R, --reduce-lengths     Reduce lengths based on minimum entry length/GCD
@@ -97,6 +97,8 @@ JAMTAXBVCLIJMPSTAYRORTSXSTXADEYSECMPLDXBEQSEINYBVSBCCPXBCSTYAJSRTINCLDYBITXSEDEC
 The 256 verified ok offsets (~1057/224*8 bits, min unit=7 bits) are:
 [124, 109, 0, 0, 0, 109, 111, 0, 97, 109, 111, 0, 0, 109, 111, 0, 84, 109, 0, 0, 0, 109, 111, 0, 79, 109, 0, 0, 0, 109, 111, 0, 61, 119, 0, 0, 71, 119, 115, 0, 85, 119, 115, 0, 71, 119, 115, 0, 90, 119, 0, 0, 0, 119, 115, 0, 31, 119, 0, 0, 0, 119, 115, 0, 63, 108, 0, 0, 0, 108, 113, 0, 99, 108, 113, 0, 11, 108, 113, 0, 6, 108, 0, 0, 0, 108, 113, 0, 8, 108, 0, 0, 0, 108, 113, 0, 20, 101, 0, 0, 0, 101, 18, 0, 87, 101, 18, 0, 11, 101, 18, 0, 47, 101, 0, 0, 0, 101, 18, 0, 42, 101, 0, 0, 0, 101, 18, 0, 0, 14, 0, 0, 57, 14, 24, 0, 28, 0, 25, 0, 57, 14, 24, 0, 50, 14, 0, 0, 57, 14, 24, 0, 58, 14, 73, 0, 0, 14, 0, 0, 68, 117, 36, 0, 68, 117, 36, 0, 15, 117, 3, 0, 68, 117, 36, 0, 55, 117, 0, 0, 68, 117, 36, 0, 103, 117, 21, 0, 68, 117, 36, 0, 81, 33, 0, 0, 81, 33, 77, 0, 44, 33, 121, 0, 81, 33, 77, 0, 106, 33, 0, 0, 0, 33, 77, 0, 67, 33, 0, 0, 0, 33, 77, 0, 52, 49, 0, 0, 52, 49, 65, 0, 92, 49, 95, 0, 52, 49, 65, 0, 39, 49, 0, 0, 0, 49, 65, 0, 75, 49, 0, 0, 0, 49, 65, 0]
 ```
+
+The savings are calculated against the original input as-if it was concatenated, and likewise for only distinct words.
 
 The offsets provide a mapping from the index of a string in the input set, to the start of that string within the superstring.
 

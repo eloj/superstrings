@@ -137,12 +137,12 @@ if __name__ == "__main__":
 	order_group.add_argument("-s", "--shuffle", help="Shuffle the input", action="store_true", default=False)
 	order_group.add_argument("-S", "--sort", help="Sort input by entry frequency", action="store_true", default=False)
 	order_group.add_argument("-L", "--loops", help="Shuffle and regenerate until min-length doesn't improve", action="store", type=int, default=0)
-	order_group.add_argument("-B", "--brute", help="Use brute-force. Warning: Only for tiny inputs!", action="store_true")
+	order_group.add_argument("-B", "--brute", help="Brute-force optimal superstring. Warning: Only for tiny inputs!", action="store_true")
 	order_group.add_argument("-A", "--algo", metavar="ALGO", help="Algorithm selection", action="store", type=str)
 
 	argp.add_argument("-C", "--comment", metavar="STR", help="String(s) that start a comment in the input", action="extend", nargs=1, type=str)
 	argp.add_argument("-F", "--mtf", metavar="STR", help="Input element(s) to move-to-front", action="extend", nargs=1, type=str)
-	argp.add_argument("-j", "--join-only", help="Only join input, don't generate superstring", action="store_true")
+	argp.add_argument("-j", "--join-only", help="Only join input, don't approximate superstring", action="store_true")
 	# argp.add_argument("--bps", help="Encode as n bits-per-symbol", action="extend", type=int, default=8)
 	argp.add_argument("-i", "--index-table", help="Always output offset/index table", action="store_true")
 	argp.add_argument("-l", "--length-table", help="Always output lengths table", action="store_true")
@@ -182,7 +182,7 @@ if __name__ == "__main__":
 		algo_func = ssp.greedy
 
 	if args.verbose > 0:
-		print(f"Using algorithm {algo_func}")
+		print(f"Selected algorithm {algo_func}")
 
 	original_input = data_loader(args)
 	input_bps = 0
@@ -330,7 +330,8 @@ if __name__ == "__main__":
 		opt_len = len(output)
 		saved = original_input_len - opt_len
 		saved_unique = unique_input_len - opt_len
-		print(f"Generated Superstring is {opt_len} characters, saving {saved} on original, {saved_unique} on unique:")
+		print("Generated Superstring" if not args.join_only else "Joined input", end='')
+		print(f" is {opt_len} characters, saving {saved} on original, {saved_unique} on unique:")
 	print(output)
 
 	#
